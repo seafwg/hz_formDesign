@@ -15,32 +15,8 @@
               刷新
             </el-button>
           </el-button-group>
-          <el-menu-item index="1">
-            <span slot="title">导航一</span>
-          </el-menu-item>
-          <el-menu-item index="2">
-            <span slot="title">导航二</span>
-          </el-menu-item>
-          <el-menu-item index="3">
-            <span slot="title">导航三</span>
-          </el-menu-item>
-          <el-menu-item index="4">
-            <span slot="title">导航一</span>
-          </el-menu-item>
-          <el-menu-item index="5">
-            <span slot="title">导航二</span>
-          </el-menu-item>
-          <el-menu-item index="6">
-            <span slot="title">导航三</span>
-          </el-menu-item>
-          <el-menu-item index="7">
-            <span slot="title">导航一</span>
-          </el-menu-item>
-          <el-menu-item index="8">
-            <span slot="title">导航二</span>
-          </el-menu-item>
-          <el-menu-item index="9">
-            <span slot="title">导航三</span>
+          <el-menu-item v-for="item in formTypes" :key="item">
+            <span slot="title">{{ item }}</span>
           </el-menu-item>
         </el-menu>
       </el-aside>
@@ -54,10 +30,10 @@
               <el-input v-model="formSearch.user" />
             </el-form-item>
             <el-form-item class="search_btn">
-              <el-button type="primary" size="mini" @click="onSubmit">
+              <el-button type="primary" size="mini">
                 搜索
               </el-button>
-              <el-button type="danger" size="mini" @click="onSubmit">
+              <el-button type="danger" size="mini">
                 清空搜索
               </el-button>
             </el-form-item>
@@ -109,8 +85,9 @@
         </el-header>
         <el-main class="formlist_main">
           <el-table
-            :data="tableData"
+            :data="currentData"
             style="width: 100%"
+            height="430"
           >
             <el-table-column
               type="selection"
@@ -153,38 +130,35 @@
             <el-table-column
               prop="key"
               label="标识键"
-              width="180"
+              width="200"
             />
             <el-table-column
               prop="type"
               label="类型"
-              width="180"
+              width="140"
             />
             <el-table-column
               prop="version"
               label="版本号"
-              width="180"
+              width="140"
             />
             <el-table-column
               prop="state"
               label="状态"
-              width="180"
+              width="140"
             />
             <el-table-column
               prop="time"
               label="创建时间"
-              width="180"
+              width="140"
             />
           </el-table>
-          <div class="block">
-            <span class="demonstration">完整功能</span>
+          <div class="pagination">
             <el-pagination
-              :current-page="currentPage4"
-              :page-sizes="[100, 200, 300, 400]"
-              :page-size="100"
-              layout="total, sizes, prev, pager, next, jumper"
-              :total="400"
-              @size-change="handleSizeChange"
+              :current-page="currentPage"
+              :page-size="pageSize"
+              layout="total, prev, pager, next, jumper"
+              :total="tableData.length"
               @current-change="handleCurrentChange"
             />
           </div>
@@ -223,7 +197,11 @@ export default {
       }, {}, {
       }, {}, {
       }, {}, {
-      }, {}]
+      }, {}],
+      currentPage: 1,
+      pageSize: 10,
+      currentData: [],
+      formTypes: ['资产管理', '应收管理', '应付管理', '总账工单', '税务工单']
     }
   },
   mounted() {
@@ -232,6 +210,13 @@ export default {
       const oldJson = JSON.parse(oldJsonStr)
       console.log('oldJson:', oldJson)
       this.formItem = oldJson
+    }
+    this.currentData = this.tableData.slice(0, this.pageSize)
+  },
+  methods: {
+    handleCurrentChange(cur) {
+      this.currentPage = cur
+      this.currentData = this.tableData.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
     }
   }
 }
@@ -242,23 +227,22 @@ export default {
   .formlist_container {
     height: 100%;
   }
+  .el-menu{
+    border: none;
+  }
   .el-header, .el-footer {
     background-color: #B3C0D1;
-    color: #333;
   }
   .el-header{
+    background-color: white;
     height: 80px;
   }
   .el-aside {
-    background-color: #D3DCE6;
-    color: #333;
     text-align: center;
-    border-right: #333 solid 1px;
+    margin-right: 5px;
   }
 
   .el-main {
-    background-color: #E9EEF3;
-    color: #333;
     text-align: center;
     padding: 0px;
   }
@@ -283,6 +267,9 @@ export default {
     margin-left: 10px;
     font-size: $font-mini;
   }
+  .pagination{
+    margin-top: 10px;
+  }
 
 </style>
 
@@ -306,7 +293,7 @@ $font-mini:9px;
       font-size: 9px;
     }
 }
-  .formlist_Main {
+  .formlist_main {
     .el-table {
       th {
       font-size: $font-mini;
