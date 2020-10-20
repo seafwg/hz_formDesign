@@ -274,7 +274,7 @@ export default {
 </style>
 
 <style lang="scss">
-$font-mini:9px;
+$font-mini:12px;
   .formlist_header {
     margin-top: 10px;
     width: 800px;
